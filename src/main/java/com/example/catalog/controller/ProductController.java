@@ -38,7 +38,7 @@ public class ProductController {
      * Returns a single product by ID, or 404 if not found.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getById(@PathVariable Long id) {
+    public ResponseEntity<Product> getById(@PathVariable("id") Long id) {
         return service.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
