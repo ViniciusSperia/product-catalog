@@ -6,22 +6,24 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a simple
 
 - Create, retrieve, update, and delete (soft delete) products
 - Field validation with meaningful error messages
-- Persistence using PostgreSQL
-- Timestamps for creation and updates (automatically managed)
-- Global exception handling with custom error response structure
-- Clean architecture with separation of concerns (DTO, Entity, Mapper, Service, Repository, Controller)
+- PostgreSQL persistence with JPA/Hibernate
+- Timestamps for creation and update (auto-managed)
+- Global exception handling with custom response format
+- Clean architecture (DTO, Entity, Mapper, Service, Repository, Controller)
 - Logging with SLF4J
+- ✅ Swagger UI for interactive API documentation
 
 ## Technologies Used
 
 - Java 17
 - Spring Boot 3.2+
-- Spring Data JPA
+- Spring Web + Spring Data JPA
 - Spring Validation
 - PostgreSQL
 - Lombok
 - Hibernate ORM
-- SLF4J
+- SLF4J Logging
+- Swagger (springdoc-openapi)
 
 ## How to Run Locally
 
@@ -31,93 +33,115 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a simple
    git clone https://github.com/ViniciusSperia/catalog-api.git
    ```
 
-2. Configure your PostgreSQL database:
+2. Create and configure your PostgreSQL database:
 
-    - Create a database, e.g., `catalog_db`
-    - Update the `application.properties` file with your database credentials:
-      ```properties
-      spring.datasource.url=jdbc:postgresql://localhost:5432/catalog_db
-      spring.datasource.username=your_username
-      spring.datasource.password=your_password
-      ```
+   - Create a database named `catalog_db` (or any name)
+   - Update your `src/main/resources/application.properties`:
 
-3. Build and run the application:
+     ```properties
+     spring.datasource.url=jdbc:postgresql://localhost:5432/catalog_db
+     spring.datasource.username=your_username
+     spring.datasource.password=your_password
+     ```
+
+3. Run the application:
 
    ```bash
    ./mvnw spring-boot:run
    ```
 
-4. Test the API endpoints using Postman or curl.
+4. Access the Swagger UI:
+
+   ```
+   http://localhost:8080/swagger-ui.html
+   ```
 
 ## API Endpoints
 
-### Create a Product (POST)
+### Create Product (POST)
 
-`POST /api/products`
+```http
+POST /api/products
+```
 
 ```json
 {
-  "name": "T-shirt",
-  "description": "Black cotton T-shirt",
-  "price": 49.99,
-  "stock": 30
+   "name": "T-shirt",
+   "description": "Black cotton T-shirt",
+   "price": 49.99,
+   "stock": 30
 }
 ```
 
 ### Get All Products (GET)
 
-`GET /api/products`
+```http
+GET /api/products
+```
 
 ### Get Product by ID (GET)
 
-`GET /api/products/{id}`
+```http
+GET /api/products/{id}
+```
 
 ### Update Product (PUT)
 
-`PUT /api/products/{id}`
+```http
+PUT /api/products/{id}
+```
 
 ```json
 {
-  "name": "Updated T-shirt",
-  "description": "Updated description",
-  "price": 59.99,
-  "stock": 50
+   "name": "Updated T-shirt",
+   "description": "Updated description",
+   "price": 59.99,
+   "stock": 50
 }
 ```
 
-### Delete Product (DELETE)
+### Delete Product (Soft Delete)
 
-`DELETE /api/products/{id}`  
-(Performs soft delete by setting `active = false`)
+```http
+DELETE /api/products/{id}
+```
+
+Sets `active = false`.
+
+---
 
 ## Project Structure
 
 ```
 src/main/java/com/example/catalog
-├── controller         # REST controllers
-├── dto                # Request and response DTOs
+├── config         # Swagger configuration
+├── controller     # REST Controllers (with Swagger + logging)
+├── dto            # Request/Response DTOs
 │   ├── request
 │   └── response
-├── exception          # Global exception handling
-├── mapper             # Entity to DTO mappers
-├── model              # JPA entity
-├── repository         # Spring Data JPA interfaces
-├── service            # Business logic
+├── exception      # Global exception handling
+├── logging        # Custom log events or filters
+├── mapper         # Entity ↔ DTO mapping
+├── model          # JPA entity with audit + soft delete
+├── repository     # Spring Data interfaces
+├── service        # Business logic (with logging)
+├── util           # Utility classes
 └── CatalogApplication.java
 ```
 
 ## What I Learned in This Project
 
-- Building a CRUD API with Spring Boot
-- Using DTOs and mappers for abstraction
-- Applying field validation and centralized error handling
-- Logging and exception visibility
-- PostgreSQL integration and schema auto-creation
-- Soft deletes using an `active` flag
-- Clean code principles and layered architecture
+- RESTful API development with Spring Boot 3
+- DTO abstraction and model mapping
+- Validation and exception handling
+- Logging with SLF4J
+- PostgreSQL and Hibernate integration
+- Swagger/OpenAPI for documentation
+- Soft delete design
+- Code layering and clean separation of concerns
 
-## Author 
+## Author
 
-- Developed by Vinicius Speria
-- [github.com/ViniciusSperia](https://github.com/ViniciusSperia)
-- Contact: [vinicius.speria.tech@gmail.com](vinicius.speria.tech@gmail.com)
+- Developed by **Vinicius Speria**
+- GitHub: [github.com/ViniciusSperia](https://github.com/ViniciusSperia)
+- Email: [vinicius.speria.tech@gmail.com](mailto:vinicius.speria.tech@gmail.com)
