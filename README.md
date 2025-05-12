@@ -14,6 +14,7 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a simple
 - Swagger UI for interactive API documentation
 - Paginated and sortable product listing via `/api/products/pageable`
 - Dynamic filtering by name (contains), minPrice (>=), and minStock (>=)
+- Integration tests for product filtering, sorting and soft delete validation
 
 ## Technologies Used
 
@@ -26,6 +27,7 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a simple
 - Hibernate ORM
 - SLF4J Logging
 - Swagger (springdoc-openapi)
+- JUnit 5 + TestRestTemplate (Integration Testing)
 
 ## How to Run Locally
 
@@ -75,12 +77,6 @@ POST /api/products
 }
 ```
 
-### Get All Products (GET)
-
-```http
-GET /api/products
-```
-
 ### Get Product by ID (GET)
 
 ```http
@@ -100,7 +96,8 @@ Query Parameters (optional):
 - `minStock` – minimum stock
 - `page` – page number (default `0`)
 - `size` – number of items per page (default `10`)
-- `sort` – sorting format: `field,direction` (e.g., `price,desc`)
+- `sortField` – field to sort by (default `name`)
+- `direction` – `asc` or `desc`
 
 ### Update Product (PUT)
 
@@ -124,8 +121,6 @@ DELETE /api/products/{id}
 ```
 
 Sets `active = false`.
-
----
 
 ## Project Structure
 
@@ -155,6 +150,7 @@ src/main/java/com/example/catalog
 - PostgreSQL and Hibernate integration
 - Swagger/OpenAPI for documentation
 - Soft delete design
+- Integration tests for filtered and paginated endpoints
 - Code layering and clean separation of concerns
 
 ## Author

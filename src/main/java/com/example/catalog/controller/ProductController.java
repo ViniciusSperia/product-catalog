@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Arrays;
 
 @RestController
@@ -36,31 +37,26 @@ public class ProductController {
     @GetMapping("/pageable")
     @Operation(summary = "List active products with filters and pagination",
             description = "Returns paginated and filtered list of active products")
-    public ResponseEntity<Page<ProductResponse>> getFilteredPaginatedProducts(
+    public Page<ProductResponse> getFilteredPaginatedProducts(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Integer minStock,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id,asc") String[] sort
+            @RequestParam(defaultValue = "name") String sortField,
+            @RequestParam(defaultValue = "asc") String direction
     ) {
-        Sort sortObj = Sort.by(Arrays.stream(sort)
-                .map(s -> {
-                    String[] parts = s.split(",");
-                    return new Sort.Order(
-                            parts.length > 1 && parts[1].equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC,
-                            parts[0]
-                    );
-                }).toList());
+        log.info("Listing products with filters and pagination");
 
-        Pageable pageable = PageRequest.of(page, size, sortObj);
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(sortDirection, sortField)));
+
         ProductFilterRequest filters = new ProductFilterRequest();
         filters.setName(name);
         filters.setMinPrice(minPrice);
         filters.setMinStock(minStock);
 
-        log.info("Listing products with filters and pagination");
-        return ResponseEntity.ok(productService.filterActiveProducts(filters, pageable));
+        return productService.filterActiveProducts(filters, pageable);
     }
 
     /**
@@ -82,7 +78,9 @@ public class ProductController {
     @Operation(summary = "Create a new product", description = "Adds a product to the catalog with active = true.")
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
         log.info("Creating new product: {}", request.getName());
-        return ResponseEntity.ok(productService.save(request));
+        ProductResponse response = productService.save(request);
+        URI location = URI.create("/api/products/" + response.getId());
+        return ResponseEntity.created(location).body(response); // HTTP 201
     }
 
     /**

@@ -64,4 +64,11 @@ public class Product {
     public int hashCode() {
         return Objects.hash(id); // Generates hash from ID
     }
+
+    public Product(String name, BigDecimal price, Integer stock) {
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+        this.active = true;
+    }
 }
