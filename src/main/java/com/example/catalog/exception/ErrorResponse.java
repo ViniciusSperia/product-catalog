@@ -1,19 +1,27 @@
 package com.example.catalog.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.Map;
 
-/**
- * A simple DTO to represent error details returned to the client.
- */
 @Getter
-@AllArgsConstructor
+@Setter
+
 public class ErrorResponse {
-    private final LocalDateTime timestamp;
-    private final int status;
-    private final String error;
-    private final String message;
-    private final String path;
+    private int status;
+    private String message;
+    private Map<String, String> errors; // campo opcional para erros de campo
+
+    public ErrorResponse(int status, String message) {
+        this.status = status;
+        this.message = message;
+    }
+
+    public ErrorResponse(int status, String message, Map<String, String> errors) {
+        this.status = status;
+        this.message = message;
+        this.errors = errors;
+    }
+
 }

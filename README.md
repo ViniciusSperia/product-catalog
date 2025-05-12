@@ -11,7 +11,9 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a simple
 - Global exception handling with custom response format
 - Clean architecture (DTO, Entity, Mapper, Service, Repository, Controller)
 - Logging with SLF4J
-- ✅ Swagger UI for interactive API documentation
+- Swagger UI for interactive API documentation
+- Paginated and sortable product listing via `/api/products/pageable`
+- Dynamic filtering by name (contains), minPrice (>=), and minStock (>=)
 
 ## Technologies Used
 
@@ -84,6 +86,21 @@ GET /api/products
 ```http
 GET /api/products/{id}
 ```
+
+### List Products with Filters and Pagination (GET)
+
+```http
+GET /api/products/pageable
+```
+
+Query Parameters (optional):
+
+- `name` – substring to match in product name
+- `minPrice` – minimum price
+- `minStock` – minimum stock
+- `page` – page number (default `0`)
+- `size` – number of items per page (default `10`)
+- `sort` – sorting format: `field,direction` (e.g., `price,desc`)
 
 ### Update Product (PUT)
 

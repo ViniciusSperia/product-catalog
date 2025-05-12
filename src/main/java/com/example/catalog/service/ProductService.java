@@ -1,102 +1,98 @@
 package com.example.catalog.service;
 
 import com.example.catalog.dto.request.ProductRequest;
+import com.example.catalog.dto.request.ProductFilterRequest;
 import com.example.catalog.dto.response.ProductResponse;
+import com.example.catalog.exception.ResourceNotFoundException;
 import com.example.catalog.mapper.ProductMapper;
 import com.example.catalog.model.Product;
 import com.example.catalog.repository.ProductRepository;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
+@Slf4j
 @Service
-@RequiredArgsConstructor // Automatically generates constructor for final fields
-@Slf4j // Enables logging with log.info, log.error, etc.
 public class ProductService {
 
-    private final ProductRepository repository;
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private ProductMapper productMapper;
 
     /**
-     * Fetches all active products from the database.
+     * Returns all active products paginated and ordered.
      */
-    public List<ProductResponse> findAll() {
-        log.info("Fetching all active products");
-        return repository.findByActiveTrue().stream()
-                .map(ProductMapper::toResponse)
-                .toList();
+    public Page<ProductResponse> getAllActiveProducts(Pageable pageable) {
+        return productRepository.findByActiveTrue(pageable)
+                .map(productMapper::toResponse);
     }
 
     /**
-     * Fetches a product by ID if it's active.
-     * Throws EntityNotFoundException if not found.
+     * Returns all filtered products with pagination and sorting.
      */
-    public ProductResponse findById(Long id) {
-        log.info("Fetching product by id: {}", id);
-        Product product = repository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> {
-                    log.warn("Product not found with id: {}", id);
-                    return new EntityNotFoundException("Product not found");
-                });
-
-        return ProductMapper.toResponse(product);
+    public Page<ProductResponse> filterActiveProducts(ProductFilterRequest filters, Pageable pageable) {
+        return productRepository.findAllByFilters(
+                filters.getName(),
+                filters.getMinPrice(),
+                filters.getMinStock(),
+                pageable
+        ).map(productMapper::toResponse);
     }
 
     /**
-     * Creates and saves a new product with `active = true`.
+     * Creates and saves a new product with 'active = true'.
      * Uses ProductMapper to convert DTO to Entity.
      */
     @Transactional
     public ProductResponse save(ProductRequest dto) {
-        Product product = ProductMapper.toEntity(dto);
+        Product product = productMapper.toEntity(dto);
         log.info("Creating product: {}", dto.getName());
         product.setActive(true); // ensure it's active on creation
-        Product saved = repository.save(product);
+        Product saved = productRepository.save(product);
         log.info("Product created with ID: {}", saved.getId());
-        return ProductMapper.toResponse(saved);
+        return productMapper.toResponse(saved);
+    }
+
+    /**
+     * Finds a product by ID if active, or throws exception.
+     */
+    public ProductResponse findById(Long id) {
+        Product product = productRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found"));
+        return productMapper.toResponse(product);
+    }
+
+    /**
+     * Soft deletes a product by setting 'active = false'.
+     */
+    @Transactional
+    public void delete(Long id) {
+        Product product = productRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found"));
+        product.setActive(false);
+        productRepository.save(product);
+        log.info("Product soft-deleted with ID: {}", id);
     }
 
     /**
      * Updates an existing product by ID.
-     * Throws EntityNotFoundException if not found or inactive.
      */
     @Transactional
     public ProductResponse update(Long id, ProductRequest dto) {
-        log.info("Updating product id: {}", id, dto);
-        Product product = repository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> {
-                    log.warn("Product not found or inactive: {}", id);
-                    return new EntityNotFoundException("Product not found");
-                });
+        Product product = productRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found"));
 
         product.setName(dto.getName());
-        product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
 
-        Product updated = repository.save(product);
-        log.info("Product updated successfully: {}", updated.getId());
-        return ProductMapper.toResponse(updated);
-    }
-
-    /**
-     * Performs a soft delete by marking the product as inactive.
-     * Throws EntityNotFoundException if not found or already inactive.
-     */
-    @Transactional
-    public void delete(Long id) {
-        log.info("Soft-deleting product id: {}", id);
-        Product product = repository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> {
-                    log.warn("Product not found or already inactive: {}", id);
-                    return new EntityNotFoundException("Product not found");
-                });
-
-        product.setActive(false);
-        repository.save(product);
-        log.info("Product marked as inactive: {}", id);
+        Product updated = productRepository.save(product);
+        log.info("Product updated with ID: {}", id);
+        return productMapper.toResponse(updated);
     }
 }
