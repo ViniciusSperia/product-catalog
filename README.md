@@ -1,128 +1,123 @@
-#  Product Catalog API
+## Product Catalog API (Spring Boot + PostgreSQL)
 
-A simple RESTful API built with **Spring Boot 3** and **Java 17**, using **PostgreSQL** for persistence. It manages a catalog of products with basic CRUD operations and validation.
+This is a RESTful API built with Spring Boot 3 and Java 17 for managing a simple product catalog.
 
----
+## Features
 
-##  Features
+- Create, retrieve, update, and delete (soft delete) products
+- Field validation with meaningful error messages
+- Persistence using PostgreSQL
+- Timestamps for creation and updates (automatically managed)
+- Global exception handling with custom error response structure
+- Clean architecture with separation of concerns (DTO, Entity, Mapper, Service, Repository, Controller)
+- Logging with SLF4J
 
-- Create, read, update, and delete products
-- Input validation using Jakarta Bean Validation
-- PostgreSQL database integration with Spring Data JPA
-- Auto-managed `createdAt` and `updatedAt` timestamps
-- Clean code architecture: DTOs, entities, services, controllers
-- Well-structured, scalable, and easy to test
-
----
-
-##  Technologies Used
+## Technologies Used
 
 - Java 17
-- Spring Boot 3.2.x
+- Spring Boot 3.2+
 - Spring Data JPA
 - Spring Validation
 - PostgreSQL
-- Hibernate ORM
 - Lombok
+- Hibernate ORM
+- SLF4J
 
----
+## How to Run Locally
 
-##  Project Structure
+1. Clone the repository:
 
-```
-src/main/java/com/example/catalog
-├── controller         # REST API controllers
-├── dto                # Request/response models (DTOs)
-├── model              # JPA entity (Product)
-├── repository         # Spring Data JPA repository
-├── service            # Business logic layer
-└── CatalogApplication.java
-```
+   ```bash
+   git clone https://github.com/ViniciusSperia/catalog-api.git
+   ```
 
----
+2. Configure your PostgreSQL database:
 
-##  How to Run Locally
+    - Create a database, e.g., `catalog_db`
+    - Update the `application.properties` file with your database credentials:
+      ```properties
+      spring.datasource.url=jdbc:postgresql://localhost:5432/catalog_db
+      spring.datasource.username=your_username
+      spring.datasource.password=your_password
+      ```
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/ViniciusSperia/catalog-api.git
-cd catalog-api
-```
+3. Build and run the application:
 
-### 2. Configure the database connection in `src/main/resources/application.properties`
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/catalog_db
-spring.datasource.username=your_username
-spring.datasource.password=your_password
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-```
+   ```bash
+   ./mvnw spring-boot:run
+   ```
 
-### 3. Run the application
-```bash
-./mvnw spring-boot:run
-```
+4. Test the API endpoints using Postman or curl.
 
----
+## API Endpoints
 
-##  API Endpoints
+### Create a Product (POST)
 
-###  Create Product
-```http
-POST /products
-```
+`POST /api/products`
+
 ```json
 {
   "name": "T-shirt",
   "description": "Black cotton T-shirt",
-  "price": 49.90,
-  "stock": 25
+  "price": 49.99,
+  "stock": 30
 }
 ```
 
-###  List All Products
-```http
-GET /products
-```
+### Get All Products (GET)
 
-###  Get Product by ID
-```http
-GET /products/{id}
-```
+`GET /api/products`
 
-###  Update Product
-```http
-PUT /products/{id}
-```
+### Get Product by ID (GET)
+
+`GET /api/products/{id}`
+
+### Update Product (PUT)
+
+`PUT /api/products/{id}`
+
 ```json
 {
-  "name": "Updated name",
+  "name": "Updated T-shirt",
   "description": "Updated description",
-  "price": 79.90,
-  "stock": 40
+  "price": 59.99,
+  "stock": 50
 }
 ```
 
-###  Delete Product
-```http
-DELETE /products/{id}
+### Delete Product (DELETE)
+
+`DELETE /api/products/{id}`  
+(Performs soft delete by setting `active = false`)
+
+## Project Structure
+
+```
+src/main/java/com/example/catalog
+├── controller         # REST controllers
+├── dto                # Request and response DTOs
+│   ├── request
+│   └── response
+├── exception          # Global exception handling
+├── mapper             # Entity to DTO mappers
+├── model              # JPA entity
+├── repository         # Spring Data JPA interfaces
+├── service            # Business logic
+└── CatalogApplication.java
 ```
 
----
+## What I Learned in This Project
 
-##  What I Learned
+- Building a CRUD API with Spring Boot
+- Using DTOs and mappers for abstraction
+- Applying field validation and centralized error handling
+- Logging and exception visibility
+- PostgreSQL integration and schema auto-creation
+- Soft deletes using an `active` flag
+- Clean code principles and layered architecture
 
-- Spring Boot layered architecture (DTO, Service, Repository)
-- PostgreSQL integration with Hibernate and JPA
-- RESTful API best practices
-- Lombok to reduce boilerplate
-- Validation and error handling in APIs
-- Timestamp fields with `@CreationTimestamp` and `@UpdateTimestamp`
+## Author 
 
----
-
-##  Author
-
-*Developed by *Vinicius Speria**  
-[vinicius.speria.tech@gmail.com](vinicius.speria.tech@gmail.com)  
-[github.com/ViniciusSperia](https://github.com/ViniciusSperia)
+- Developed by Vinicius Speria
+- [github.com/ViniciusSperia](https://github.com/ViniciusSperia)
+- Contact: [vinicius.speria.tech@gmail.com](vinicius.speria.tech@gmail.com)

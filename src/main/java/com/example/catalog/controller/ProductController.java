@@ -1,78 +1,72 @@
 package com.example.catalog.controller;
 
-import com.example.catalog.model.dto.ProductDto;
-import com.example.catalog.model.Product;
+import com.example.catalog.dto.request.ProductRequest;
+import com.example.catalog.dto.response.ProductResponse;
 import com.example.catalog.service.ProductService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * REST controller that exposes endpoints for managing products.
- */
 @RestController
 @RequestMapping("/api/products")
+@RequiredArgsConstructor // Automatically injects final fields via constructor
+@Slf4j // Enables logging
 public class ProductController {
 
     private final ProductService service;
 
-    @Autowired // Dependency injection via constructor
-    public ProductController(ProductService service) {
-        this.service = service;
-    }
-
     /**
      * GET /api/products
-     * Returns a list of all products.
+     * Returns a list of all active products.
      */
     @GetMapping
-    public ResponseEntity<List<Product>> getAll() {
+    public ResponseEntity<List<ProductResponse>> getAll() {
+        log.info("Received request to list all products");
         return ResponseEntity.ok(service.findAll());
     }
 
     /**
      * GET /api/products/{id}
-     * Returns a single product by ID, or 404 if not found.
+     * Retrieves a product by ID.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getById(@PathVariable("id") Long id) {
-        return service.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ProductResponse> getById(@PathVariable("id") Long id) {
+        log.info("Fetching product with ID: {}", id);
+        return ResponseEntity.ok(service.findById(id));
     }
 
     /**
      * POST /api/products
-     * Creates a new product from a ProductDto.
+     * Creates a new product.
      */
     @PostMapping
-    public ResponseEntity<Product> create(@Valid @RequestBody ProductDto dto) {
-        Product saved = service.save(dto);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
+        log.info("Creating new product: {}", request.getName());
+        return ResponseEntity.ok(service.save(request));
     }
 
     /**
      * PUT /api/products/{id}
-     * Updates a product by ID. Returns 404 if not found.
+     * Updates an existing product by ID.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable Long id, @Valid @RequestBody ProductDto dto) {
-        Product updated = service.update(id, dto);
-        if (updated == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<ProductResponse> update(@PathVariable("id") Long id,
+                                                  @Valid @RequestBody ProductRequest request) {
+        log.info("Updating product with ID: {}", id);
+        return ResponseEntity.ok(service.update(id, request));
     }
 
     /**
      * DELETE /api/products/{id}
-     * Deletes a product by ID. Returns 204 No Content even if the ID doesn't exist.
+     * Performs a soft delete (marks as inactive).
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        log.info("Soft-deleting product with ID: {}", id);
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

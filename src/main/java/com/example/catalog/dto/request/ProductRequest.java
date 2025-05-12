@@ -1,4 +1,4 @@
-package com.example.catalog.model.dto;
+package com.example.catalog.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDto {
+public class ProductRequest {
 
     @NotBlank(message = "Name is required")
     private String name;

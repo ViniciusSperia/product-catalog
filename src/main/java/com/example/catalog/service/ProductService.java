@@ -1,84 +1,102 @@
 package com.example.catalog.service;
 
-import com.example.catalog.model.dto.ProductDto;
+import com.example.catalog.dto.request.ProductRequest;
+import com.example.catalog.dto.response.ProductResponse;
+import com.example.catalog.mapper.ProductMapper;
 import com.example.catalog.model.Product;
 import com.example.catalog.repository.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-
 
 @Service
+@RequiredArgsConstructor // Automatically generates constructor for final fields
+@Slf4j // Enables logging with log.info, log.error, etc.
 public class ProductService {
 
     private final ProductRepository repository;
 
-    @Autowired // Injects the repository dependency
-    public ProductService(ProductRepository repository) {
-        this.repository = repository;
-    }
-
     /**
-     * Returns all products from the database.
+     * Fetches all active products from the database.
      */
-    public List<Product> findAll() {
-        return repository.findAll();
+    public List<ProductResponse> findAll() {
+        log.info("Fetching all active products");
+        return repository.findByActiveTrue().stream()
+                .map(ProductMapper::toResponse)
+                .toList();
     }
 
     /**
-     * Finds a product by ID.
-     * Returns an Optional, which allows the caller to handle missing data.
+     * Fetches a product by ID if it's active.
+     * Throws EntityNotFoundException if not found.
      */
-    public Optional<Product> findById(Long id) {
-        return repository.findById(id);
+    public ProductResponse findById(Long id) {
+        log.info("Fetching product by id: {}", id);
+        Product product = repository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> {
+                    log.warn("Product not found with id: {}", id);
+                    return new EntityNotFoundException("Product not found");
+                });
+
+        return ProductMapper.toResponse(product);
     }
 
     /**
-     * Saves a new product.
-     * @Transactional ensures that DB operations complete together or rollback on failure.
+     * Creates and saves a new product with `active = true`.
+     * Uses ProductMapper to convert DTO to Entity.
      */
     @Transactional
-    public Product save(ProductDto dto) {
-        Product product = new Product();
+    public ProductResponse save(ProductRequest dto) {
+        Product product = ProductMapper.toEntity(dto);
+        log.info("Creating product: {}", dto.getName());
+        product.setActive(true); // ensure it's active on creation
+        Product saved = repository.save(product);
+        log.info("Product created with ID: {}", saved.getId());
+        return ProductMapper.toResponse(saved);
+    }
+
+    /**
+     * Updates an existing product by ID.
+     * Throws EntityNotFoundException if not found or inactive.
+     */
+    @Transactional
+    public ProductResponse update(Long id, ProductRequest dto) {
+        log.info("Updating product id: {}", id, dto);
+        Product product = repository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> {
+                    log.warn("Product not found or inactive: {}", id);
+                    return new EntityNotFoundException("Product not found");
+                });
+
         product.setName(dto.getName());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
 
-        return repository.save(product);
+        Product updated = repository.save(product);
+        log.info("Product updated successfully: {}", updated.getId());
+        return ProductMapper.toResponse(updated);
     }
 
     /**
-     * Updates an existing product.
-     * Returns null if the product doesn't exist.
-     */
-    @Transactional
-    public Product update(Long id, ProductDto dto) {
-        Optional<Product> existing = repository.findById(id);
-        if (existing.isEmpty()) {
-            return null;
-        }
-
-        Product product = existing.get();
-        product.setName(dto.getName());
-        product.setDescription(dto.getDescription());
-        product.setPrice(dto.getPrice());
-        product.setStock(dto.getStock());
-
-        return repository.save(product);
-    }
-
-    /**
-     * Deletes a product by ID.
-     * If the product doesn't exist, does nothing.
+     * Performs a soft delete by marking the product as inactive.
+     * Throws EntityNotFoundException if not found or already inactive.
      */
     @Transactional
     public void delete(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-        }
+        log.info("Soft-deleting product id: {}", id);
+        Product product = repository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> {
+                    log.warn("Product not found or already inactive: {}", id);
+                    return new EntityNotFoundException("Product not found");
+                });
+
+        product.setActive(false);
+        repository.save(product);
+        log.info("Product marked as inactive: {}", id);
     }
 }

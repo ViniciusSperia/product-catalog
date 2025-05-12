@@ -47,6 +47,9 @@ public class Product {
     @Column(name = "updated_at") // No special restrictions
     private LocalDateTime updatedAt;
 
+    @Column(name = "active")
+    private boolean active = true;
+
     // Custom equals() to compare only by ID
     @Override
     public boolean equals(Object o) {
