@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,12 +38,14 @@ public class ProductService {
      * Returns all filtered products with pagination and sorting.
      */
     public Page<ProductResponse> filterActiveProducts(ProductFilterRequest filters, Pageable pageable) {
-        return productRepository.findAllByFilters(
+        Specification<Product> spec = ProductSpecification.filterBy(
                 filters.getName(),
                 filters.getMinPrice(),
-                filters.getMinStock(),
-                pageable
-        ).map(productMapper::toResponse);
+                filters.getMinStock()
+        );
+
+        return productRepository.findAll(spec, pageable)
+                .map(productMapper::toResponse);
     }
 
     /**
@@ -91,6 +94,7 @@ public class ProductService {
         product.setName(dto.getName());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
+        product.setDescription(dto.getDescription());
 
         Product updated = productRepository.save(product);
         log.info("Product updated with ID: {}", id);
