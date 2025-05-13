@@ -7,6 +7,7 @@ import com.example.catalog.exception.ResourceNotFoundException;
 import com.example.catalog.mapper.ProductMapper;
 import com.example.catalog.model.Product;
 import com.example.catalog.repository.ProductRepository;
+import com.example.catalog.spec.ProductSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

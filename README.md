@@ -14,7 +14,8 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a simple
 - Swagger UI for interactive API documentation
 - Paginated and sortable product listing via `/api/products/pageable`
 - Dynamic filtering by name (contains), minPrice (>=), and minStock (>=)
-- Integration tests for product filtering, sorting and soft delete validation
+- Specification-based query construction (no JPQL)
+- Integration tests for product filtering, sorting, update, and soft delete
 
 ## Technologies Used
 
@@ -132,25 +133,26 @@ src/main/java/com/example/catalog
 │   ├── request
 │   └── response
 ├── exception      # Global exception handling
-├── logging        # Custom log events or filters
 ├── mapper         # Entity ↔ DTO mapping
 ├── model          # JPA entity with audit + soft delete
-├── repository     # Spring Data interfaces
+├── repository     # Spring Data interfaces + Specification
 ├── service        # Business logic (with logging)
-├── util           # Utility classes
+├── spec           # Specification-based dynamic filters
+├── test           # Integration test classes
 └── CatalogApplication.java
 ```
 
 ## What I Learned in This Project
 
 - RESTful API development with Spring Boot 3
-- DTO abstraction and model mapping
+- DTO abstraction and model mapping with MapStruct
 - Validation and exception handling
 - Logging with SLF4J
 - PostgreSQL and Hibernate integration
 - Swagger/OpenAPI for documentation
-- Soft delete design
-- Integration tests for filtered and paginated endpoints
+- Soft delete design with active flag
+- Specification-based filtering with pagination
+- Integration testing with JUnit and TestRestTemplate
 - Code layering and clean separation of concerns
 
 ## Author

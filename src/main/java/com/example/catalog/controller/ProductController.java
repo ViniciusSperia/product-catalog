@@ -34,30 +34,36 @@ public class ProductController {
      * Filters: name (contains), minPrice (>=), minStock (>=)
      * Supports sorting and pagination.
      */
-    @GetMapping("/pageable")
-    @Operation(summary = "List active products with filters and pagination",
-            description = "Returns paginated and filtered list of active products")
-    public Page<ProductResponse> getFilteredPaginatedProducts(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Integer minStock,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name") String sortField,
-            @RequestParam(defaultValue = "asc") String direction
-    ) {
-        log.info("Listing products with filters and pagination");
+        @GetMapping("/pageable")
+        @Operation(summary = "List active products with filters and pagination",
+                description = "Returns paginated and filtered list of active products")
+        public Page<ProductResponse> getFilteredPaginatedProducts(
+                @RequestParam(required = false) String name,
+                @RequestParam(required = false) Double minPrice,
+                @RequestParam(required = false) Integer minStock,
+                @RequestParam(defaultValue = "0") int page,
+                @RequestParam(defaultValue = "10") int size,
+                @RequestParam(defaultValue = "name") String sortField,
+                @RequestParam(defaultValue = "asc") String direction
+        ) {
+            log.info("Listing products with filters and pagination");
 
-        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(sortDirection, sortField)));
+            Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+            Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(sortDirection, sortField)));
 
-        ProductFilterRequest filters = new ProductFilterRequest();
-        filters.setName(name);
-        filters.setMinPrice(minPrice);
-        filters.setMinStock(minStock);
+            name = (name != null && name.isBlank()) ? null : name;
+            minPrice = (minPrice != null && minPrice == 0.0) ? null : minPrice;
+            minStock = (minStock != null && minStock == 0) ? null : minStock;
 
-        return productService.filterActiveProducts(filters, pageable);
-    }
+            ProductFilterRequest filters = new ProductFilterRequest();
+
+            filters.setMinPrice(minPrice);
+            filters.setMinStock(minStock);
+            filters.setName(name);
+            log.info(">>> filters.getName() class = {}", filters.getName() != null ? filters.getName().getClass().getName() : "null");
+
+            return productService.filterActiveProducts(filters, pageable);
+        }
 
     /**
      * GET /api/products/{id}

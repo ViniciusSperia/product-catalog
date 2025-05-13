@@ -1,6 +1,15 @@
+com\example\catalog\spec\ProductSpecification.class
 com\example\catalog\service\ProductService.class
-com\example\catalog\repository\ProductRepository.class
+com\example\catalog\config\SwaggerConfig.class
+com\example\catalog\dto\response\ProductResponse.class
 com\example\catalog\model\Product.class
+com\example\catalog\dto\request\ProductFilterRequest.class
+com\example\catalog\mapper\ProductMapper.class
 com\example\catalog\ProductCatalogApplication.class
+com\example\catalog\exception\GlobalExceptionHandler.class
+com\example\catalog\exception\ResourceNotFoundException.class
+com\example\catalog\logging\LogAdvice.class
+com\example\catalog\repository\ProductRepository.class
+com\example\catalog\dto\request\ProductRequest.class
 com\example\catalog\controller\ProductController.class
-com\example\catalog\model\dto\ProductDto.class
+com\example\catalog\exception\ErrorResponse.class
