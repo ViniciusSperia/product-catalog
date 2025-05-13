@@ -4,6 +4,7 @@ import com.example.catalog.dto.request.ProductRequest;
 import com.example.catalog.model.Product;
 import com.example.catalog.repository.ProductRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -69,5 +70,50 @@ class ProductIntegrationTest {
         // 5. Validate in DB: product is present but inactive
         Product product = productRepository.findById(id).orElseThrow();
         assertThat(product.isActive()).isFalse();
+    }
+
+    @BeforeEach
+    @Test
+    void shouldUpdateProductSuccessfully() throws Exception {
+        // Step 1: Save a product directly via repository
+        Product original = ProductTestFactory.createDefault();
+        productRepository.save(original);
+
+        Long productId = original.getId();
+
+        // Step 2: Create an update request
+        ProductRequest updateRequest = new ProductRequest();
+        updateRequest.setName("Updated Name");
+        updateRequest.setDescription("Updated Description");
+        updateRequest.setPrice(new BigDecimal("99.99"));
+        updateRequest.setStock(50);
+
+        // Step 3: Prepare headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> entity = new HttpEntity<>(
+                objectMapper.writeValueAsString(updateRequest), headers
+        );
+
+        // Step 4: Execute PUT
+        String updateUrl = "http://localhost:" + port + "/api/products/" + productId;
+        ResponseEntity<String> response = restTemplate.exchange(updateUrl, HttpMethod.PUT, entity, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        // Step 5: Validate via GET
+        ResponseEntity<String> getResponse = restTemplate.getForEntity(updateUrl, String.class);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        String body = getResponse.getBody();
+        assertThat(body).contains("Updated Name");
+        assertThat(body).contains("Updated Description");
+
+        // Step 6: Validate via DB
+        Product updated = productRepository.findById(productId).orElseThrow();
+        assertThat(updated.getName()).isEqualTo("Updated Name");
+        assertThat(updated.getDescription()).isEqualTo("Updated Description");
+        assertThat(updated.getPrice()).isEqualByComparingTo("99.99");
+        assertThat(updated.getStock()).isEqualTo(50);
     }
 }

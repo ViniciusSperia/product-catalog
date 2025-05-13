@@ -33,9 +33,9 @@ class ProductPaginationIntegrationTest {
     void setup() {
         productRepository.deleteAll();
 
-        Product p1 = new Product("Product One", new BigDecimal("50.00"), 10);
-        Product p2 = new Product("Filtered Product", new BigDecimal("100.00"), 20);
-        Product p3 = new Product("Inactive Product", new BigDecimal("100.00"), 30);
+        Product p1 = ProductTestFactory.create("Product One", new BigDecimal("50.00"), 10);
+        Product p2 = ProductTestFactory.create("Filtered Product", new BigDecimal("100.00"), 20);
+        Product p3 = ProductTestFactory.create("Inactive Product", new BigDecimal("100.00"), 30);
         p3.setActive(false);
 
         productRepository.save(p1);
