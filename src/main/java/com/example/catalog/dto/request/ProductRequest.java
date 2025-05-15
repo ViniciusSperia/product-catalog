@@ -30,6 +30,7 @@ public class ProductRequest {
     private BigDecimal price;
 
     @Min(value = 0, message = "Stock cannot be negative")
+    @NotNull(message = "Stock is required")
     private Integer stock;
 
 

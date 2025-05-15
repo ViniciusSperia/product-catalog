@@ -17,12 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Arrays;
 
 @RestController
 @RequestMapping("/api/products")
-@RequiredArgsConstructor // Automatically injects final fields via constructor
-@Slf4j // Enables logging
+@RequiredArgsConstructor
+@Slf4j
 @Tag(name = "Products", description = "Endpoints for managing products in the catalog")
 public class ProductController {
 
@@ -31,39 +30,27 @@ public class ProductController {
     /**
      * GET /api/products/pageable
      * Returns a paginated list of active products with optional filters.
-     * Filters: name (contains), minPrice (>=), minStock (>=)
-     * Supports sorting and pagination.
      */
-        @GetMapping("/pageable")
-        @Operation(summary = "List active products with filters and pagination",
-                description = "Returns paginated and filtered list of active products")
-        public Page<ProductResponse> getFilteredPaginatedProducts(
-                @RequestParam(required = false) String name,
-                @RequestParam(required = false) Double minPrice,
-                @RequestParam(required = false) Integer minStock,
-                @RequestParam(defaultValue = "0") int page,
-                @RequestParam(defaultValue = "10") int size,
-                @RequestParam(defaultValue = "name") String sortField,
-                @RequestParam(defaultValue = "asc") String direction
-        ) {
-            log.info("Listing products with filters and pagination");
+    @GetMapping("/pageable")
+    @Operation(summary = "List active products with filters and pagination",
+            description = "Returns paginated and filtered list of active products")
+    public ResponseEntity<Page<ProductResponse>> getFilteredPaginatedProducts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Integer minStock,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortField,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        log.info("Listing products with filters and pagination");
 
-            Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-            Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(sortDirection, sortField)));
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(sortDirection, sortField)));
 
-            name = (name != null && name.isBlank()) ? null : name;
-            minPrice = (minPrice != null && minPrice == 0.0) ? null : minPrice;
-            minStock = (minStock != null && minStock == 0) ? null : minStock;
-
-            ProductFilterRequest filters = new ProductFilterRequest();
-
-            filters.setMinPrice(minPrice);
-            filters.setMinStock(minStock);
-            filters.setName(name);
-            log.info(">>> filters.getName() class = {}", filters.getName() != null ? filters.getName().getClass().getName() : "null");
-
-            return productService.filterActiveProducts(filters, pageable);
-        }
+        ProductFilterRequest filters = ProductFilterRequest.of(name, minPrice, minStock);
+        return ResponseEntity.ok(productService.filterActiveProducts(filters, pageable));
+    }
 
     /**
      * GET /api/products/{id}
@@ -86,7 +73,7 @@ public class ProductController {
         log.info("Creating new product: {}", request.getName());
         ProductResponse response = productService.save(request);
         URI location = URI.create("/api/products/" + response.getId());
-        return ResponseEntity.created(location).body(response); // HTTP 201
+        return ResponseEntity.created(location).body(response);
     }
 
     /**

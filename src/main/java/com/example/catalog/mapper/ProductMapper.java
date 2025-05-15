@@ -23,8 +23,16 @@ public class ProductMapper {
     public Product toEntity(ProductRequest dto) {
         Product product = new Product();
         product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
         return product;
+    }
+
+    public void updateEntity(Product product, ProductRequest dto) {
+        product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
+        product.setPrice(dto.getPrice());
+        product.setStock(dto.getStock());
     }
 }
