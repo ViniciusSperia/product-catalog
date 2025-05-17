@@ -1,34 +1,44 @@
+
 ## Product Catalog API (Spring Boot + PostgreSQL)
 
-This is a RESTful API built with Spring Boot 3 and Java 17 for managing a simple product catalog.
+This is a RESTful API built with Spring Boot 3 and Java 17 for managing a secure product catalog system with user authentication, role-based access control, and dynamic filtering.
 
 ## Features
 
-- Create, retrieve, update, and delete (soft delete) products
+- Secure user authentication with JWT
+- Role-based access control:
+   - `ADMIN`: can create all roles
+   - `SUPERVISOR`: can create `VENDOR` and `CUSTOMER`
+   - `VENDOR`: can create `CUSTOMER`
+   - `CUSTOMER`: self-registration only
+- Product management with full CRUD (soft delete included)
+- Protected endpoints by role using `@PreAuthorize`
+- Public registration for `CUSTOMER` role
+- Paginated, sortable, and filterable product listing
+- Specification-based dynamic query filtering
 - Field validation with meaningful error messages
 - PostgreSQL persistence with JPA/Hibernate
-- Timestamps for creation and update (auto-managed)
-- Global exception handling with custom response format
-- Clean architecture (DTO, Entity, Mapper, Service, Repository, Controller)
-- Logging with SLF4J
+- Global exception handling with a unified response structure
 - Swagger UI for interactive API documentation
-- Paginated and sortable product listing via `/api/products/pageable`
-- Dynamic filtering by name (contains), minPrice (>=), and minStock (>=)
-- Specification-based query construction (no JPQL)
-- Integration tests for product filtering, sorting, update, and soft delete
+- Clean layered architecture with DTO, Entity, Service, Repository, and Controller
+- Logging with SLF4J
+- Integration tests for authentication, filtering, and product management
 
 ## Technologies Used
 
 - Java 17
 - Spring Boot 3.2+
-- Spring Web + Spring Data JPA
-- Spring Validation
+- Spring Web
+- Spring Data JPA
+- Spring Security (JWT)
+- Spring Validation (Jakarta)
 - PostgreSQL
 - Lombok
 - Hibernate ORM
 - SLF4J Logging
 - Swagger (springdoc-openapi)
 - JUnit 5 + TestRestTemplate (Integration Testing)
+- H2 (for test environment)
 
 ## How to Run Locally
 
@@ -38,9 +48,9 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a simple
    git clone https://github.com/ViniciusSperia/catalog-api.git
    ```
 
-2. Create and configure your PostgreSQL database:
+2. Set up a PostgreSQL database:
 
-   - Create a database named `catalog_db` (or any name)
+   - Create a database named `catalog_db`
    - Update your `src/main/resources/application.properties`:
 
      ```properties
@@ -55,15 +65,107 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a simple
    ./mvnw spring-boot:run
    ```
 
-4. Access the Swagger UI:
+4. Access Swagger UI:
 
    ```
    http://localhost:8080/swagger-ui.html
    ```
 
-## API Endpoints
+## Authentication Endpoints
 
-### Create Product (POST)
+### Register as CUSTOMER (Public)
+
+```http
+POST /auth/register
+```
+
+```json
+{
+  "name": "Alice Customer",
+  "email": "alice@example.com",
+  "password": "StrongPass123!"
+}
+```
+
+Creates a user with the `CUSTOMER` role.
+
+---
+
+### Login
+
+```http
+POST /auth/login
+```
+
+```json
+{
+  "email": "alice@example.com",
+  "password": "StrongPass123!"
+}
+```
+
+Returns a JWT token:
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR..."
+}
+```
+
+---
+
+### Create User by Role (Authenticated)
+
+```http
+POST /auth/create
+Authorization: Bearer <your_token>
+```
+
+```json
+{
+  "name": "Bob Vendor",
+  "email": "bob@example.com",
+  "password": "Vendor123!",
+  "role": "VENDOR"
+}
+```
+
+Role restrictions:
+- ADMIN: can create all roles
+- SUPERVISOR: can create `VENDOR`, `CUSTOMER`
+- VENDOR: can create `CUSTOMER`
+
+---
+
+## Product Endpoints
+
+All endpoints require authentication unless otherwise noted.
+
+### List Products with Filters and Pagination
+
+```http
+GET /api/products/pageable
+Authorization: Bearer <token>
+```
+
+Optional query params:
+- `name`
+- `minPrice`
+- `minStock`
+- `page`, `size`
+- `sortField`, `direction`
+
+---
+
+### Get Product by ID
+
+```http
+GET /api/products/{id}
+```
+
+---
+
+### Create Product (`ADMIN` or `SUPERVISOR`)
 
 ```http
 POST /api/products
@@ -71,36 +173,16 @@ POST /api/products
 
 ```json
 {
-   "name": "T-shirt",
-   "description": "Black cotton T-shirt",
-   "price": 49.99,
-   "stock": 30
+  "name": "T-shirt",
+  "description": "Black cotton T-shirt",
+  "price": 49.99,
+  "stock": 30
 }
 ```
 
-### Get Product by ID (GET)
+---
 
-```http
-GET /api/products/{id}
-```
-
-### List Products with Filters and Pagination (GET)
-
-```http
-GET /api/products/pageable
-```
-
-Query Parameters (optional):
-
-- `name` – substring to match in product name
-- `minPrice` – minimum price
-- `minStock` – minimum stock
-- `page` – page number (default `0`)
-- `size` – number of items per page (default `10`)
-- `sortField` – field to sort by (default `name`)
-- `direction` – `asc` or `desc`
-
-### Update Product (PUT)
+### Update Product (`ADMIN` or `SUPERVISOR`)
 
 ```http
 PUT /api/products/{id}
@@ -108,52 +190,64 @@ PUT /api/products/{id}
 
 ```json
 {
-   "name": "Updated T-shirt",
-   "description": "Updated description",
-   "price": 59.99,
-   "stock": 50
+  "name": "Updated T-shirt",
+  "description": "Updated description",
+  "price": 59.99,
+  "stock": 50
 }
 ```
 
-### Delete Product (Soft Delete)
+---
+
+### Delete Product (Soft Delete) (`ADMIN` only)
 
 ```http
 DELETE /api/products/{id}
 ```
 
-Sets `active = false`.
+Soft deletes the product (`active = false`).
+
+---
 
 ## Project Structure
 
 ```
 src/main/java/com/example/catalog
-├── config         # Swagger configuration
-├── controller     # REST Controllers (with Swagger + logging)
-├── dto            # Request/Response DTOs
-│   ├── request
-│   └── response
-├── exception      # Global exception handling
-├── mapper         # Entity ↔ DTO mapping
-├── model          # JPA entity with audit + soft delete
-├── repository     # Spring Data interfaces + Specification
-├── service        # Business logic (with logging)
-├── spec           # Specification-based dynamic filters
-├── test           # Integration test classes
-└── CatalogApplication.java
+├── config
+│   └── security          # JWT, filters, password encoding
+│   └── swagger           # Swagger config
+├── module
+│   ├── auth              # Authentication and user logic
+│   │   ├── controller
+│   │   ├── dto
+│   │   ├── model
+│   │   ├── repository
+│   │   └── service
+│   ├── product           # Product CRUD logic
+│   │   ├── controller
+│   │   ├── dto
+│   │   ├── model
+│   │   ├── repository
+│   │   ├── service
+│   │   └── spec          # Specification filters
+├── exception             # Global exception handler
+├── CatalogApplication.java
 ```
+
+---
 
 ## What I Learned in This Project
 
-- RESTful API development with Spring Boot 3
-- DTO abstraction and model mapping with MapStruct
-- Validation and exception handling
-- Logging with SLF4J
-- PostgreSQL and Hibernate integration
-- Swagger/OpenAPI for documentation
-- Soft delete design with active flag
-- Specification-based filtering with pagination
-- Integration testing with JUnit and TestRestTemplate
-- Code layering and clean separation of concerns
+- JWT authentication and filter chains in Spring Security
+- Role-based access using `@PreAuthorize` and role resolution
+- Clean architecture design with modular domains
+- DTO abstraction and validation
+- Exception handling with centralized controller advice
+- Swagger documentation strategy (with selective `@Schema`)
+- Soft delete design and filtering only active data
+- Integration testing with isolated H2 and TestRestTemplate
+
+---
 
 ## Author
 

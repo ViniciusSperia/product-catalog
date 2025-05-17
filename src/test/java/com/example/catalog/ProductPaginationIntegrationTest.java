@@ -1,7 +1,7 @@
 package com.example.catalog;
 
-import com.example.catalog.model.Product;
-import com.example.catalog.repository.ProductRepository;
+import com.example.catalog.module.product.model.Product;
+import com.example.catalog.module.product.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

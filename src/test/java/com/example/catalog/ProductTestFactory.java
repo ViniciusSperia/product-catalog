@@ -1,6 +1,6 @@
 package com.example.catalog;
 
-import com.example.catalog.model.Product;
+import com.example.catalog.module.product.model.Product;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 

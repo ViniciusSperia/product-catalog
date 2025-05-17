@@ -1,11 +1,12 @@
 package com.example.catalog.controller;
 
-import com.example.catalog.dto.request.ProductRequest;
+import com.example.catalog.module.product.controller.ProductController;
+import com.example.catalog.module.product.dto.request.ProductRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.example.catalog.dto.response.ProductResponse;
-import com.example.catalog.exception.ResourceNotFoundException;
-import com.example.catalog.service.ProductService;
+import com.example.catalog.module.product.dto.response.ProductResponse;
+import com.example.catalog.module.product.exception.ResourceNotFoundException;
+import com.example.catalog.module.product.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

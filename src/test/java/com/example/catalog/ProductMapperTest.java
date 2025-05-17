@@ -1,9 +1,9 @@
 package com.example.catalog;
 
-import com.example.catalog.dto.request.ProductRequest;
-import com.example.catalog.dto.response.ProductResponse;
-import com.example.catalog.mapper.ProductMapper;
-import com.example.catalog.model.Product;
+import com.example.catalog.module.product.dto.request.ProductRequest;
+import com.example.catalog.module.product.dto.response.ProductResponse;
+import com.example.catalog.module.product.mapper.ProductMapper;
+import com.example.catalog.module.product.model.Product;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;

@@ -1,0 +1,5 @@
+com\example\catalog\controller\ProductControllerTest.class
+com\example\catalog\ProductIntegrationTest.class
+com\example\catalog\ProductPaginationIntegrationTest.class
+com\example\catalog\ProductTestFactory.class
+com\example\catalog\ProductMapperTest.class
