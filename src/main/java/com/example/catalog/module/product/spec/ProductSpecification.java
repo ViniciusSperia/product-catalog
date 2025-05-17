@@ -1,10 +1,10 @@
 package com.example.catalog.module.product.spec;
 
 import com.example.catalog.module.product.model.Product;
+import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 
-import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 

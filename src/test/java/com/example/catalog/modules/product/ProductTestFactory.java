@@ -1,4 +1,4 @@
-package com.example.catalog;
+package com.example.catalog.modules.product;
 
 import com.example.catalog.module.product.model.Product;
 import org.springframework.boot.test.context.SpringBootTest;

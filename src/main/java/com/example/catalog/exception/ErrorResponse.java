@@ -1,4 +1,4 @@
-package com.example.catalog.module.product.exception;
+package com.example.catalog.exception;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,4 +24,6 @@ public class ErrorResponse {
         this.errors = errors;
     }
 
+    public ErrorResponse(String unauthorized, String message) {
+    }
 }

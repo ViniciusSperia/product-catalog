@@ -1,9 +1,9 @@
 package com.example.catalog.module.product.service;
 
-import com.example.catalog.module.product.dto.request.ProductRequest;
+import com.example.catalog.exception.ResourceNotFoundException;
 import com.example.catalog.module.product.dto.request.ProductFilterRequest;
+import com.example.catalog.module.product.dto.request.ProductRequest;
 import com.example.catalog.module.product.dto.response.ProductResponse;
-import com.example.catalog.module.product.exception.ResourceNotFoundException;
 import com.example.catalog.module.product.mapper.ProductMapper;
 import com.example.catalog.module.product.model.Product;
 import com.example.catalog.module.product.repository.ProductRepository;

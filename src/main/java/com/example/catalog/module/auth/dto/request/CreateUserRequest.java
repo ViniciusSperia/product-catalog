@@ -3,7 +3,9 @@ package com.example.catalog.module.auth.dto.request;
 import com.example.catalog.module.auth.model.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor

@@ -1,4 +1,3 @@
-
 ## Product Catalog API (Spring Boot + PostgreSQL)
 
 This is a RESTful API built with Spring Boot 3 and Java 17 for managing a secure product catalog system with user authentication, role-based access control, and dynamic filtering.
@@ -7,10 +6,10 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a secure
 
 - Secure user authentication with JWT
 - Role-based access control:
-   - `ADMIN`: can create all roles
-   - `SUPERVISOR`: can create `VENDOR` and `CUSTOMER`
-   - `VENDOR`: can create `CUSTOMER`
-   - `CUSTOMER`: self-registration only
+    - `ADMIN`: can create all roles
+    - `SUPERVISOR`: can create `VENDOR` and `CUSTOMER`
+    - `VENDOR`: can create `CUSTOMER`
+    - `CUSTOMER`: self-registration only
 - Product management with full CRUD (soft delete included)
 - Protected endpoints by role using `@PreAuthorize`
 - Public registration for `CUSTOMER` role
@@ -50,14 +49,14 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a secure
 
 2. Set up a PostgreSQL database:
 
-   - Create a database named `catalog_db`
-   - Update your `src/main/resources/application.properties`:
+    - Create a database named `catalog_db`
+    - Update your `src/main/resources/application.properties`:
 
-     ```properties
-     spring.datasource.url=jdbc:postgresql://localhost:5432/catalog_db
-     spring.datasource.username=your_username
-     spring.datasource.password=your_password
-     ```
+      ```properties
+      spring.datasource.url=jdbc:postgresql://localhost:5432/catalog_db
+      spring.datasource.username=your_username
+      spring.datasource.password=your_password
+      ```
 
 3. Run the application:
 

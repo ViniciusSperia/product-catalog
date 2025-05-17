@@ -1,5 +1,6 @@
-C:\Users\Speria\IdeaProjects\product-catalog\src\test\java\com\example\catalog\controller\ProductControllerTest.java
-C:\Users\Speria\IdeaProjects\product-catalog\src\test\java\com\example\catalog\ProductMapperTest.java
-C:\Users\Speria\IdeaProjects\product-catalog\src\test\java\com\example\catalog\ProductPaginationIntegrationTest.java
-C:\Users\Speria\IdeaProjects\product-catalog\src\test\java\com\example\catalog\ProductTestFactory.java
-C:\Users\Speria\IdeaProjects\product-catalog\src\test\java\com\example\catalog\ProductIntegrationTest.java
+C:\Users\Speria\IdeaProjects\product-catalog\src\test\java\com\example\catalog\modules\product\ProductMapperTest.java
+C:\Users\Speria\IdeaProjects\product-catalog\src\test\java\com\example\catalog\modules\product\ProductPaginationIntegrationTest.java
+C:\Users\Speria\IdeaProjects\product-catalog\src\test\java\com\example\catalog\modules\auth\AuthControllerIntegrationTest.java
+C:\Users\Speria\IdeaProjects\product-catalog\src\test\java\com\example\catalog\modules\product\ProductTestFactory.java
+C:\Users\Speria\IdeaProjects\product-catalog\src\test\java\com\example\catalog\modules\product\ProductIntegrationTest.java
+C:\Users\Speria\IdeaProjects\product-catalog\src\test\java\com\example\catalog\modules\product\controller\ProductControllerTest.java

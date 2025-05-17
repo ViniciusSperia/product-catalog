@@ -1,4 +1,4 @@
-package com.example.catalog.module.product.exception;
+package com.example.catalog.exception;
 
 /**
  * Exception thrown when a requested resource is not found.
