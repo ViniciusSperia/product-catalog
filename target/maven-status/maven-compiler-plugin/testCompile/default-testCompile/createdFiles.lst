@@ -2,6 +2,8 @@ com\example\catalog\modules\auth\AuthControllerIntegrationTest$1.class
 com\example\catalog\modules\product\controller\ProductControllerTest.class
 com\example\catalog\modules\auth\AuthControllerIntegrationTest.class
 com\example\catalog\modules\product\ProductTestFactory.class
+com\example\catalog\modules\wishlist\WishlistControllerIntegrationTest.class
 com\example\catalog\modules\product\ProductMapperTest.class
+com\example\catalog\modules\wishlist\WishlistControllerIntegrationTest$1.class
 com\example\catalog\modules\product\ProductPaginationIntegrationTest.class
 com\example\catalog\modules\product\ProductIntegrationTest.class

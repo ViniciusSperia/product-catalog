@@ -22,6 +22,7 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a secure
 - Clean layered architecture with DTO, Entity, Service, Repository, and Controller
 - Logging with SLF4J
 - Integration tests for authentication, filtering, and product management
+- Wishlist module with secure endpoints and integration testing 
 
 ## Technologies Used
 
@@ -43,32 +44,32 @@ This is a RESTful API built with Spring Boot 3 and Java 17 for managing a secure
 
 1. Clone the repository:
 
-   ```bash
-   git clone https://github.com/ViniciusSperia/catalog-api.git
-   ```
+```bash
+git clone https://github.com/ViniciusSperia/catalog-api.git
+```
 
 2. Set up a PostgreSQL database:
 
-    - Create a database named `catalog_db`
-    - Update your `src/main/resources/application.properties`:
+Create a database named `catalog_db`  
+Update your `src/main/resources/application.properties`:
 
-      ```properties
-      spring.datasource.url=jdbc:postgresql://localhost:5432/catalog_db
-      spring.datasource.username=your_username
-      spring.datasource.password=your_password
-      ```
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/catalog_db
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+```
 
 3. Run the application:
 
-   ```bash
-   ./mvnw spring-boot:run
-   ```
+```bash
+./mvnw spring-boot:run
+```
 
 4. Access Swagger UI:
 
-   ```
-   http://localhost:8080/swagger-ui.html
-   ```
+```
+http://localhost:8080/swagger-ui.html
+```
 
 ## Authentication Endpoints
 
@@ -208,6 +209,44 @@ Soft deletes the product (`active = false`).
 
 ---
 
+## Wishlist Endpoints (`CUSTOMER`)
+
+Authenticated customers can manage a personal wishlist of products.
+
+### Add Product to Wishlist
+
+```http
+POST /wishlist/{productId}
+Authorization: Bearer <token>
+```
+
+Adds the specified product to the user's wishlist.  
+Returns `200 OK` if added, or error if already present.
+
+---
+
+### List Wishlist
+
+```http
+GET /wishlist
+Authorization: Bearer <token>
+```
+
+Returns a list of product summaries from the user's wishlist.
+
+---
+
+### Remove Product from Wishlist
+
+```http
+DELETE /wishlist/{productId}
+Authorization: Bearer <token>
+```
+
+Removes the specified product from the wishlist.
+
+---
+
 ## Project Structure
 
 ```
@@ -229,6 +268,12 @@ src/main/java/com/example/catalog
 │   │   ├── repository
 │   │   ├── service
 │   │   └── spec          # Specification filters
+│   ├── wishlist          # Wishlist logic (new ✅)
+│   │   ├── controller
+│   │   ├── dto
+│   │   ├── model
+│   │   ├── repository
+│   │   └── service
 ├── exception             # Global exception handler
 ├── CatalogApplication.java
 ```
@@ -245,6 +290,18 @@ src/main/java/com/example/catalog
 - Swagger documentation strategy (with selective `@Schema`)
 - Soft delete design and filtering only active data
 - Integration testing with isolated H2 and TestRestTemplate
+- Wishlist modules using transactional service logic and authorization
+- Best practices for one-to-many relationships with filtering
+
+---
+
+## New Enhancements
+
+- ✅ `@Builder` added to `Product` for streamlined object creation in tests
+- ✅ Wishlist feature fully implemented: add, list, and remove items securely
+- ✅ Wishlist integration tests using real endpoints and assertions
+- ✅ Soft delete respected across all product references
+- ✅ Transactional annotation added to prevent EntityManager issues
 
 ---
 

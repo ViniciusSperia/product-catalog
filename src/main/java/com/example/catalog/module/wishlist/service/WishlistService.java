@@ -7,6 +7,7 @@ import com.example.catalog.module.wishlist.dto.response.WishlistResponse;
 import com.example.catalog.module.wishlist.model.WishlistItem;
 import com.example.catalog.module.wishlist.repository.WishlistRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +16,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
     private final ProductRepository productRepository;
 
+    @Transactional
     public void addToWishlist(Long productId, User user) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
@@ -36,6 +39,7 @@ public class WishlistService {
         wishlistRepository.save(item);
     }
 
+    @Transactional
     public void removeFromWishlist(Long productId, User user) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));

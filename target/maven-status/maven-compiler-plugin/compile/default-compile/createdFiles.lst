@@ -1,3 +1,4 @@
+com\example\catalog\module\wishlist\dto\response\WishlistResponse.class
 com\example\catalog\module\auth\config\PasswordEncoderConfig.class
 com\example\catalog\config\swagger\SwaggerConfig.class
 com\example\catalog\module\auth\service\AuthService.class
@@ -26,7 +27,6 @@ com\example\catalog\config\security\UserDetailsServiceImpl.class
 com\example\catalog\module\wishlist\model\WishlistItem$WishlistItemBuilder.class
 com\example\catalog\ProductCatalogApplication.class
 com\example\catalog\module\auth\controller\AuthController.class
-com\example\catalog\module\wishlist\dto\WishlistResponse.class
 com\example\catalog\config\security\JwtAuthenticationFilter.class
 com\example\catalog\module\product\spec\ProductSpecification.class
 com\example\catalog\exception\ResourceNotFoundException.class
@@ -36,3 +36,4 @@ com\example\catalog\module\wishlist\repository\WishlistRepository.class
 com\example\catalog\module\product\dto\response\ProductResponse.class
 com\example\catalog\exception\ErrorResponse.class
 com\example\catalog\module\auth\model\User$UserBuilder.class
+com\example\catalog\module\product\model\Product$ProductBuilder.class
