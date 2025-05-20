@@ -1,9 +1,10 @@
 package com.example.catalog.module.wishlist.service;
 
 import com.example.catalog.module.auth.model.User;
+import com.example.catalog.module.product.mapper.ProductMapper;
 import com.example.catalog.module.product.model.Product;
 import com.example.catalog.module.product.repository.ProductRepository;
-import com.example.catalog.module.wishlist.dto.response.WishlistResponse;
+import com.example.catalog.module.wishlist.dto.response.WishlistItemResponseDTO;
 import com.example.catalog.module.wishlist.model.WishlistItem;
 import com.example.catalog.module.wishlist.repository.WishlistRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,11 +17,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     @Transactional
     public void addToWishlist(Long productId, User user) {
@@ -51,16 +52,14 @@ public class WishlistService {
         return wishlistRepository.findByUser(user);
     }
 
+    public List<WishlistItemResponseDTO> getWishlistItems(User user) {
+        List<WishlistItem> items = wishlistRepository.findByUser(user);
 
-    public List<WishlistResponse> getWishlistResponses(User user) {
-        return wishlistRepository.findByUser(user).stream()
-                .map(item -> new WishlistResponse(
-                        item.getProduct().getId(),
-                        item.getProduct().getName(),
-                        item.getProduct().getDescription(),
-                        item.getProduct().getPrice(),
-                        item.getAddedAt()
-                ))
+        return items.stream()
+                .map(item -> WishlistItemResponseDTO.builder()
+                        .product(productMapper.toResponse(item.getProduct()))
+                        .addedAt(item.getAddedAt())
+                        .build())
                 .toList();
     }
 }

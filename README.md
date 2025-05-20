@@ -1,309 +1,98 @@
 ## Product Catalog API (Spring Boot + PostgreSQL)
 
-This is a RESTful API built with Spring Boot 3 and Java 17 for managing a secure product catalog system with user authentication, role-based access control, and dynamic filtering.
+A secure, role-based RESTful API for managing products, built with Spring Boot 3 and Java 17. Supports JWT authentication, dynamic filtering, and modular domain structure.
 
 ## Features
 
-- Secure user authentication with JWT
-- Role-based access control:
-    - `ADMIN`: can create all roles
-    - `SUPERVISOR`: can create `VENDOR` and `CUSTOMER`
-    - `VENDOR`: can create `CUSTOMER`
-    - `CUSTOMER`: self-registration only
-- Product management with full CRUD (soft delete included)
-- Protected endpoints by role using `@PreAuthorize`
-- Public registration for `CUSTOMER` role
-- Paginated, sortable, and filterable product listing
-- Specification-based dynamic query filtering
-- Field validation with meaningful error messages
-- PostgreSQL persistence with JPA/Hibernate
-- Global exception handling with a unified response structure
-- Swagger UI for interactive API documentation
-- Clean layered architecture with DTO, Entity, Service, Repository, and Controller
-- Logging with SLF4J
-- Integration tests for authentication, filtering, and product management
-- Wishlist module with secure endpoints and integration testing 
+- JWT authentication and authorization
+- Role-based access control with `@PreAuthorize`
+- Public customer registration
+- Product CRUD with soft delete
+- Filtering, pagination, and sorting
+- Wishlist system per authenticated customer
+- Order module with product list and price summary
+- Integration testing with H2 and TestRestTemplate
+- Swagger documentation (OpenAPI 3)
 
-## Technologies Used
+## Core Modules
 
-- Java 17
-- Spring Boot 3.2+
-- Spring Web
-- Spring Data JPA
-- Spring Security (JWT)
-- Spring Validation (Jakarta)
-- PostgreSQL
-- Lombok
-- Hibernate ORM
-- SLF4J Logging
-- Swagger (springdoc-openapi)
-- JUnit 5 + TestRestTemplate (Integration Testing)
-- H2 (for test environment)
+| Module   | Description                                |
+|----------|--------------------------------------------|
+| Auth     | JWT login, registration, role-based user creation |
+| Product  | Full CRUD with filters, sorting, pagination, soft delete |
+| Wishlist | Add/list/remove favorite products per user |
+| Orders   | Create orders with item list and total cost |
 
-## How to Run Locally
+## Getting Started
 
-1. Clone the repository:
+### 1. Clone the project
 
 ```bash
 git clone https://github.com/ViniciusSperia/catalog-api.git
 ```
 
-2. Set up a PostgreSQL database:
+### 2. Configure database
 
-Create a database named `catalog_db`  
-Update your `src/main/resources/application.properties`:
+Update `application.properties` with your local PostgreSQL setup:
 
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/catalog_db
-spring.datasource.username=your_username
+spring.datasource.username=your_user
 spring.datasource.password=your_password
 ```
 
-3. Run the application:
+### 3. Run the app
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-4. Access Swagger UI:
+### 4. Open Swagger
 
 ```
 http://localhost:8080/swagger-ui.html
 ```
 
-## Authentication Endpoints
+## Auth Flow
 
-### Register as CUSTOMER (Public)
+| Endpoint           | Access        | Description                    |
+|--------------------|---------------|--------------------------------|
+| `POST /auth/register` | Public     | Register as `CUSTOMER`        |
+| `POST /auth/login`    | Public     | Returns JWT token             |
+| `POST /auth/create`   | Authenticated | Create user by role          |
 
-```http
-POST /auth/register
-```
-
-```json
-{
-  "name": "Alice Customer",
-  "email": "alice@example.com",
-  "password": "StrongPass123!"
-}
-```
-
-Creates a user with the `CUSTOMER` role.
-
----
-
-### Login
-
-```http
-POST /auth/login
-```
-
-```json
-{
-  "email": "alice@example.com",
-  "password": "StrongPass123!"
-}
-```
-
-Returns a JWT token:
-
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR..."
-}
-```
-
----
-
-### Create User by Role (Authenticated)
-
-```http
-POST /auth/create
-Authorization: Bearer <your_token>
-```
-
-```json
-{
-  "name": "Bob Vendor",
-  "email": "bob@example.com",
-  "password": "Vendor123!",
-  "role": "VENDOR"
-}
-```
-
-Role restrictions:
-- ADMIN: can create all roles
-- SUPERVISOR: can create `VENDOR`, `CUSTOMER`
-- VENDOR: can create `CUSTOMER`
-
----
-
-## Product Endpoints
-
-All endpoints require authentication unless otherwise noted.
-
-### List Products with Filters and Pagination
-
-```http
-GET /api/products/pageable
-Authorization: Bearer <token>
-```
-
-Optional query params:
-- `name`
-- `minPrice`
-- `minStock`
-- `page`, `size`
-- `sortField`, `direction`
-
----
-
-### Get Product by ID
-
-```http
-GET /api/products/{id}
-```
-
----
-
-### Create Product (`ADMIN` or `SUPERVISOR`)
-
-```http
-POST /api/products
-```
-
-```json
-{
-  "name": "T-shirt",
-  "description": "Black cotton T-shirt",
-  "price": 49.99,
-  "stock": 30
-}
-```
-
----
-
-### Update Product (`ADMIN` or `SUPERVISOR`)
-
-```http
-PUT /api/products/{id}
-```
-
-```json
-{
-  "name": "Updated T-shirt",
-  "description": "Updated description",
-  "price": 59.99,
-  "stock": 50
-}
-```
-
----
-
-### Delete Product (Soft Delete) (`ADMIN` only)
-
-```http
-DELETE /api/products/{id}
-```
-
-Soft deletes the product (`active = false`).
-
----
-
-## Wishlist Endpoints (`CUSTOMER`)
-
-Authenticated customers can manage a personal wishlist of products.
-
-### Add Product to Wishlist
-
-```http
-POST /wishlist/{productId}
-Authorization: Bearer <token>
-```
-
-Adds the specified product to the user's wishlist.  
-Returns `200 OK` if added, or error if already present.
-
----
-
-### List Wishlist
-
-```http
-GET /wishlist
-Authorization: Bearer <token>
-```
-
-Returns a list of product summaries from the user's wishlist.
-
----
-
-### Remove Product from Wishlist
-
-```http
-DELETE /wishlist/{productId}
-Authorization: Bearer <token>
-```
-
-Removes the specified product from the wishlist.
-
----
+Role creation rules:
+- `ADMIN` → all roles
+- `SUPERVISOR` → `VENDOR`, `CUSTOMER`
+- `VENDOR` → `CUSTOMER` only
 
 ## Project Structure
 
 ```
 src/main/java/com/example/catalog
-├── config
-│   └── security          # JWT, filters, password encoding
-│   └── swagger           # Swagger config
+├── config        # Security filters, JWT, Swagger
 ├── module
-│   ├── auth              # Authentication and user logic
-│   │   ├── controller
-│   │   ├── dto
-│   │   ├── model
-│   │   ├── repository
-│   │   └── service
-│   ├── product           # Product CRUD logic
-│   │   ├── controller
-│   │   ├── dto
-│   │   ├── model
-│   │   ├── repository
-│   │   ├── service
-│   │   └── spec          # Specification filters
-│   ├── wishlist          # Wishlist logic (new ✅)
-│   │   ├── controller
-│   │   ├── dto
-│   │   ├── model
-│   │   ├── repository
-│   │   └── service
-├── exception             # Global exception handler
-├── CatalogApplication.java
+│   ├── auth      # User, login, register, role logic
+│   ├── product   # CRUD + filtering + specs
+│   ├── wishlist  # Wishlist endpoints
+│   └── order     # Order creation and validation
+├── exception     # Global exception handling
 ```
 
----
+## Testing
 
-## What I Learned in This Project
+- Uses H2 for isolated tests
+- Covers: Authentication, Product Filters, Wishlist, Orders
+- Tools: `TestRestTemplate`, `@SpringBootTest`, `@Transactional`
 
-- JWT authentication and filter chains in Spring Security
-- Role-based access using `@PreAuthorize` and role resolution
-- Clean architecture design with modular domains
-- DTO abstraction and validation
-- Exception handling with centralized controller advice
-- Swagger documentation strategy (with selective `@Schema`)
-- Soft delete design and filtering only active data
-- Integration testing with isolated H2 and TestRestTemplate
-- Wishlist modules using transactional service logic and authorization
-- Best practices for one-to-many relationships with filtering
+## Key Concepts Implemented
 
----
-
-## New Enhancements
-
-- ✅ `@Builder` added to `Product` for streamlined object creation in tests
-- ✅ Wishlist feature fully implemented: add, list, and remove items securely
-- ✅ Wishlist integration tests using real endpoints and assertions
-- ✅ Soft delete respected across all product references
-- ✅ Transactional annotation added to prevent EntityManager issues
-
----
+- Spring Security with stateless JWT
+- Clean modular architecture
+- Global exception handler with custom error response
+- DTO-based abstraction with validation
+- Soft delete with `active = false`
+- Integration testing with assertions and context isolation
 
 ## Author
 

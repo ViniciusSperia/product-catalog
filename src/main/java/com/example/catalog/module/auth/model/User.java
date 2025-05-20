@@ -36,4 +36,8 @@ public class User {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
+    public boolean hasRole(String role) {
+        return this.role != null && this.role.name().equalsIgnoreCase(role);
+    }
 }

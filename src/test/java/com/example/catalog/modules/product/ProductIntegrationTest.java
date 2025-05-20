@@ -38,6 +38,24 @@ class ProductIntegrationTest {
         productRepository.deleteAll();
     }
 
+    private HttpHeaders getAuthHeaders() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String json = "{ \"email\": \"admin@test.com\", \"password\": \"admin123\" }";
+
+        HttpEntity<String> request = new HttpEntity<>(json, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                "http://localhost:" + port + "/auth/login", request, String.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        String token = objectMapper.readTree(response.getBody()).get("token").asText();
+
+        HttpHeaders authHeaders = new HttpHeaders();
+        authHeaders.setBearerAuth(token);
+        return authHeaders;
+    }
     @Test
     void shouldCreateAndSoftDeleteProduct() throws Exception {
         String baseUrl = "http://localhost:" + port + "/api/products";
@@ -48,7 +66,7 @@ class ProductIntegrationTest {
         request.setPrice(new BigDecimal("49.99"));
         request.setStock(20);
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = getAuthHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(request), headers);
 
@@ -58,14 +76,31 @@ class ProductIntegrationTest {
         Long id = objectMapper.readTree(postResponse.getBody()).get("id").asLong();
 
         // Confirm it's available
-        ResponseEntity<String> getResponse = restTemplate.getForEntity(baseUrl + "/" + id, String.class);
+        HttpEntity<Void> getEntity = new HttpEntity<>(getAuthHeaders());
+        ResponseEntity<String> getResponse = restTemplate.exchange(
+                baseUrl + "/" + id,
+                HttpMethod.GET,
+                getEntity,
+                String.class
+        );
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         // Delete
-        restTemplate.delete(baseUrl + "/" + id);
+        HttpEntity<Void> deleteEntity = new HttpEntity<>(getAuthHeaders());
+        restTemplate.exchange(
+                baseUrl + "/" + id,
+                HttpMethod.DELETE,
+                deleteEntity,
+                Void.class
+        );
 
         // Confirm 404
-        ResponseEntity<String> afterDelete = restTemplate.getForEntity(baseUrl + "/" + id, String.class);
+        ResponseEntity<String> afterDelete = restTemplate.exchange(
+                baseUrl + "/" + id,
+                HttpMethod.GET,
+                getEntity,
+                String.class
+        );
         assertThat(afterDelete.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
         // Confirm still in DB but inactive
@@ -86,7 +121,7 @@ class ProductIntegrationTest {
         update.setPrice(new BigDecimal("99.99"));
         update.setStock(50);
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = getAuthHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(update), headers);
 
@@ -95,7 +130,13 @@ class ProductIntegrationTest {
         ResponseEntity<String> putResponse = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
         assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        ResponseEntity<String> getResponse = restTemplate.getForEntity(url, String.class);
+        HttpEntity<Void> getEntity = new HttpEntity<>(getAuthHeaders());
+        ResponseEntity<String> getResponse = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                getEntity,
+                String.class
+        );
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(getResponse.getBody()).contains("Updated Name");
         assertThat(getResponse.getBody()).contains("Updated Description");

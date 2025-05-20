@@ -1,5 +1,6 @@
 package com.example.catalog.modules.wishlist;
 
+import com.example.catalog.module.auth.dto.request.LoginRequest;
 import com.example.catalog.module.auth.model.Role;
 import com.example.catalog.module.auth.model.User;
 import com.example.catalog.module.auth.repository.UserRepository;
@@ -7,7 +8,6 @@ import com.example.catalog.module.product.model.Product;
 import com.example.catalog.module.product.repository.ProductRepository;
 import com.example.catalog.module.wishlist.model.WishlistItem;
 import com.example.catalog.module.wishlist.repository.WishlistRepository;
-import com.example.catalog.module.auth.dto.request.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +20,7 @@ import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,6 +30,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WishlistControllerIntegrationTest {
 

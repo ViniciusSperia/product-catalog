@@ -1,7 +1,7 @@
 package com.example.catalog.modules.auth;
 
-import com.example.catalog.module.auth.dto.request.LoginRequest;
 import com.example.catalog.module.auth.dto.request.CreateUserRequest;
+import com.example.catalog.module.auth.dto.request.LoginRequest;
 import com.example.catalog.module.auth.model.Role;
 import com.example.catalog.module.auth.model.User;
 import com.example.catalog.module.auth.repository.UserRepository;
@@ -13,10 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
