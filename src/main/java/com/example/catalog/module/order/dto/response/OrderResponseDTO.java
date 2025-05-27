@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -11,8 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class OrderResponseDTO {
-    private Long id;
-    private Long userId;
+    private UUID id;
+    private UUID userId;
     private LocalDateTime createdAt;
     private boolean cancelled;
     private List<OrderItemResponseDTO> items;

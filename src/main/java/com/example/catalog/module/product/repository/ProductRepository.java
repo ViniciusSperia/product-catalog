@@ -8,12 +8,13 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
-    Optional<Product> findByIdAndActiveTrue(Long id);
+public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificationExecutor<Product> {
+    Optional<Product> findByIdAndActiveTrue(UUID id);
     Page<Product> findByActiveTrue(Pageable pageable);
-
-
+    Optional<Product> findBySlugAndActiveTrue(String slug);
+    Optional<Product> findById(UUID id);
 }
 

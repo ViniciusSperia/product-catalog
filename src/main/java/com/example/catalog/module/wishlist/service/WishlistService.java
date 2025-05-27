@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class WishlistService {
     private final ProductMapper productMapper;
 
     @Transactional
-    public void addToWishlist(Long productId, User user) {
+    public void addToWishlist(UUID productId, User user) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
@@ -41,7 +42,7 @@ public class WishlistService {
     }
 
     @Transactional
-    public void removeFromWishlist(Long productId, User user) {
+    public void removeFromWishlist(UUID productId, User user) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
@@ -62,4 +63,10 @@ public class WishlistService {
                         .build())
                 .toList();
     }
+
+    public boolean isProductInWishlist(UUID productId, User user) {
+        return wishlistRepository.findByUserAndProductId(user, productId).isPresent();
+    }
+
+
 }

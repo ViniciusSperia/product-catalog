@@ -7,14 +7,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface WishlistRepository extends JpaRepository<WishlistItem, Long> {
 
     List<WishlistItem> findByUser(User user);
 
-    List<WishlistItem> findAllByUserId(Long userId);
+    List<WishlistItem> findAllByUserId(UUID userId);
 
     Optional<WishlistItem> findByUserAndProduct(User user, Product product);
 
     void deleteByUserAndProduct(User user, Product product);
+
+    Optional<WishlistItem> findByUserAndProductId(User user, UUID productId);
+
 }

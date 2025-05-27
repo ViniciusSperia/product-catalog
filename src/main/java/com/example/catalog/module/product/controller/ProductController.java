@@ -9,15 +9,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/products")
@@ -39,7 +37,9 @@ public class ProductController {
     public ResponseEntity<Page<ProductResponse>> getFilteredPaginatedProducts(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
             @RequestParam(required = false) Integer minStock,
+            @RequestParam(required = false) UUID categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortField,
@@ -50,7 +50,7 @@ public class ProductController {
         Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(sortDirection, sortField)));
 
-        ProductFilterRequest filters = ProductFilterRequest.of(name, minPrice, minStock);
+        ProductFilterRequest filters = ProductFilterRequest.of(name, minPrice, maxPrice, minStock, categoryId);
         return ResponseEntity.ok(productService.filterActiveProducts(filters, pageable));
     }
 
@@ -61,7 +61,7 @@ public class ProductController {
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get product by ID", description = "Returns a product by its ID if it's active.")
-    public ResponseEntity<ProductResponse> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<ProductResponse> getById(@PathVariable("id") UUID id) {
         log.info("Fetching product with ID: {}", id);
         return ResponseEntity.ok(productService.findById(id));
     }
@@ -87,7 +87,7 @@ public class ProductController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERVISOR')")
     @Operation(summary = "Update product", description = "Updates the fields of an existing product by ID.")
-    public ResponseEntity<ProductResponse> update(@PathVariable("id") Long id,
+    public ResponseEntity<ProductResponse> update(@PathVariable("id") UUID id,
                                                   @Valid @RequestBody ProductRequest request) {
         log.info("Updating product with ID: {}", id);
         return ResponseEntity.ok(productService.update(id, request));
@@ -100,7 +100,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete product (soft delete)", description = "Marks the product as inactive instead of removing it.")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
         log.info("Soft-deleting product with ID: {}", id);
         productService.delete(id);
         return ResponseEntity.noContent().build();

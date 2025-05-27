@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 /**
  * DTO (Data Transfer Object) used to receive and validate input data
  * from client requests (e.g., POST or PUT).
@@ -18,7 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderItemRequestDTO {
     @NotNull
-    private Long productId;
+    private UUID productId;
 
     @NotNull
     @Min(1)

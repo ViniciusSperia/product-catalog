@@ -11,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 
 @RestController
@@ -24,7 +26,7 @@ public class WishlistController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/{productId}")
-    public ResponseEntity<Void> add(@PathVariable Long productId) {
+    public ResponseEntity<Void> add(@PathVariable UUID productId) {
         User user = userService.getAuthenticatedUser();
         wishlistService.addToWishlist(productId, user);
         return ResponseEntity.ok().build();
@@ -32,7 +34,7 @@ public class WishlistController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> remove(@PathVariable Long productId) {
+    public ResponseEntity<Void> remove(@PathVariable UUID productId) {
         User user = userService.getAuthenticatedUser();
         wishlistService.removeFromWishlist(productId, user);
         return ResponseEntity.noContent().build();
@@ -45,4 +47,14 @@ public class WishlistController {
         List<WishlistItemResponseDTO> items = wishlistService.getWishlistItems(user);
         return ResponseEntity.ok(items);
     }
+
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @GetMapping("/contains/{productId}")
+    public ResponseEntity<Map<String, Boolean>> contains(@PathVariable UUID productId) {
+        User user = userService.getAuthenticatedUser();
+        boolean exists = wishlistService.isProductInWishlist(productId, user);
+        return ResponseEntity.ok(Map.of("contains", exists));
+    }
+
+
 }

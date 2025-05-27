@@ -8,12 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
-/**
- * DTO (Data Transfer Object) used to receive and validate input data
- * from client requests (e.g., POST or PUT).
- * It does not expose internal entity logic or metadata (e.g., timestamps or database IDs).
- */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,4 +34,12 @@ public class ProductRequest {
     @Min(value = 0, message = "Stock cannot be negative")
     @Schema(description = "Available quantity in stock", example = "150")
     private Integer stock;
+
+    @NotBlank(message = "Image URL is required")
+    @Schema(description = "URL for the product image", example = "https://example.com/images/product.jpg")
+    private String imageUrl;
+
+    @NotNull(message = "Category ID is required")
+    @Schema(description = "UUID of the product category", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    private UUID categoryId;
 }
