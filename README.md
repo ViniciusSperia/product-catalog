@@ -1,6 +1,11 @@
 ## Product Catalog API (Spring Boot + PostgreSQL)
 
-A secure, role-based RESTful API for managing products, built with Spring Boot 3 and Java 17. Supports JWT authentication, dynamic filtering, and modular domain structure.
+## About the project
+
+Product Catalog API is a secure and modular product catalog backend, built with Spring Boot 3, Java 17, and PostgreSQL.
+It serves as a base for e-commerce platforms, inventory management systems, or any application that needs product control, authentication, permissions, and dynamic filtering.
+
+The idea came from a practical need for a reusable and consistent API. In many projects, authentication, product management, and role-based access were often built from scratch, with inconsistent patterns and duplicated effort. This project solves that with a standardized and extensible structure.
 
 ## Features
 
